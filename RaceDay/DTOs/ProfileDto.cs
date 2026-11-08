@@ -17,7 +17,7 @@
 
         /// <summary>Cell number.</summary>
         public string Cell { get; set; }
-
+        ///
         /// <summary>Email address.</summary>
         public string Email { get; set; }
     }
