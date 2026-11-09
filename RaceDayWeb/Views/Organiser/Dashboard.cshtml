@@ -1,6 +1,98 @@
-﻿@{
+﻿@model DashboardViewModel
+@{
     ViewData["Title"] = "Dashboard";
 }
 
-<h1 class="rd-title">Organiser dashboard</h1>
-<p class="lead">Welcome back, @Context.Session.GetString("UserName"). Your event summary will appear here in the next batch.</p>
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+    <div>
+        <h1 class="rd-title mb-0">Dashboard</h1>
+        <span class="text-muted">Welcome back, @Context.Session.GetString("UserName")</span>
+    </div>
+    <a class="btn btn-rd" asp-action="CreateEvent">Create event</a>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-6 col-lg-3">
+        <div class="card rd-card rd-stat p-3">
+            <div class="rd-stat-number">@Model.TotalEvents</div>
+            <div class="rd-stat-label">Events created</div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="card rd-card rd-stat p-3">
+            <div class="rd-stat-number">@Model.TotalEnrolments</div>
+            <div class="rd-stat-label">Total enrolments</div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="card rd-card rd-stat rd-stat-warn p-3">
+            <div class="rd-stat-number">@Model.PendingEnrolments</div>
+            <div class="rd-stat-label">Awaiting confirmation</div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="card rd-card rd-stat p-3">
+            @if (Model.NextEvent != null)
+            {
+                <div class="rd-stat-text">@Model.NextEvent.EventName</div>
+                <div class="rd-stat-label">Next: @Model.NextEvent.DateOfEvent.ToString("dd MMM yyyy")</div>
+            }
+            else
+            {
+                <div class="rd-stat-text">None</div>
+                <div class="rd-stat-label">No upcoming events</div>
+            }
+        </div>
+    </div>
+</div>
+
+<div class="card rd-card p-3 table-responsive">
+    @if (Model.Events.Count == 0)
+    {
+        <p class="text-muted p-3 mb-0">You haven't created any events yet. Use <strong>Create event</strong> to get started.</p>
+    }
+    else
+    {
+        <table class="table align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Event</th>
+                    <th>Date</th>
+                    <th class="text-center">Enrolments</th>
+                    <th class="text-center">Pending</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var e in Model.Ordered)
+                {
+                    bool isUpcoming = e.DateOfEvent >= DateTime.Now;
+                    <tr class="@(isUpcoming ? "" : "text-muted")">
+                        <td>
+                            <div class="fw-semibold">@e.EventName</div>
+                            <div class="small">@e.EventType &middot; @e.Distance.ToString("0.##") km &middot; @e.RouteInfo</div>
+                        </td>
+                        <td>
+                            @e.DateOfEvent.ToString("dd MMM yyyy HH:mm")
+                            <div class="small">@(isUpcoming ? "Upcoming" : "Past")</div>
+                        </td>
+                        <td class="text-center fw-semibold">@e.TotalEnrolments</td>
+                        <td class="text-center">
+                            @if (e.PendingEnrolments > 0)
+                            {
+                                <span class="status-badge status-pending">@e.PendingEnrolments</span>
+                            }
+                            else
+                            {
+                                <span>0</span>
+                            }
+                        </td>
+                        <td class="text-end">
+                            <a class="btn btn-sm btn-outline-rd" asp-action="Enrolments" asp-route-eventId="@e.EventID">Enrolments</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>"lead">Welcome back, @Context.Session.GetString("UserName"). Your event summary will appear here in the next batch.</p>

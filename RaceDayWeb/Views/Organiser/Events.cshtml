@@ -1,0 +1,61 @@
+﻿@model List<EventSummaryModel>
+@{
+    ViewData["Title"] = "Events";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+    <h1 class="rd-title mb-0">My events</h1>
+    <a class="btn btn-rd" asp-action="CreateEvent">Create event</a>
+</div>
+
+<div class="card rd-card p-3 table-responsive">
+    @if (Model.Count == 0)
+    {
+        <p class="text-muted p-3 mb-0">You haven't created any events yet.</p>
+    }
+    else
+    {
+        <table class="table align-middle mb-0">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Event</th>
+                    <th>Date</th>
+                    <th class="text-center">Enrolments</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var e in Model.OrderBy(x => x.DateOfEvent))
+                {
+                    <tr>
+                        <td style="width:110px">
+                            @if (!string.IsNullOrEmpty(e.BannerUrl))
+                            {
+                                <img class="rd-thumb" src="@e.BannerUrl" alt="Banner for @e.EventName" />
+                            }
+                        </td>
+                        <td>
+                            <div class="fw-semibold">@e.EventName</div>
+                            <div class="small text-muted">@e.EventType &middot; @e.Distance.ToString("0.##") km &middot; @e.RouteInfo</div>
+                        </td>
+                        <td>@e.DateOfEvent.ToString("dd MMM yyyy HH:mm")</td>
+                        <td class="text-center">@e.TotalEnrolments</td>
+                        <td class="text-end">
+                            <div class="d-flex gap-1 justify-content-end flex-wrap">
+                                <a class="btn btn-sm btn-outline-rd" asp-action="EditEvent" asp-route-id="@e.EventID">Edit</a>
+                                <a class="btn btn-sm btn-outline-rd" asp-action="Categories" asp-route-eventId="@e.EventID">Categories</a>
+                                <a class="btn btn-sm btn-outline-rd" asp-action="Enrolments" asp-route-eventId="@e.EventID">Enrolments</a>
+                                <a class="btn btn-sm btn-outline-rd" asp-action="Results" asp-route-eventId="@e.EventID">Results</a>
+                                <form asp-action="DeleteEvent" asp-route-id="@e.EventID" method="post" class="d-inline"
+                                      onsubmit="return confirm('Delete this event? This cannot be undone.');">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>

@@ -1,0 +1,67 @@
+﻿@model ResultsViewModel
+@{
+    ViewData["Title"] = "Results";
+}
+
+<h1 class="rd-title mb-3">Results</h1>
+
+<partial name="_EventPicker" model="Model" />
+
+@if (Model.SelectedEvent != null)
+{
+    if (Model.SelectedEvent.DateOfEvent > DateTime.Now)
+    {
+        <div class="alert alert-info">
+            This event hasn't taken place yet (@Model.SelectedEvent.DateOfEvent.ToString("dd MMM yyyy HH:mm")).
+            You can capture results once it has finished.
+        </div>
+    }
+
+    if (Model.Rows.Count == 0)
+    {
+        <div class="card rd-card p-4">
+            <p class="text-muted mb-0">There are no active enrolments for this event yet.</p>
+        </div>
+    }
+    else
+    {
+        foreach (var row in Model.Rows)
+        {
+            var r = row.Result;
+            string status = r != null ? r.ResultsStatus : "Finished";
+            string time = r != null && r.ResultsStatus == "Finished" ? r.FinishTime.ToString("c") : "";
+
+            <form asp-action="SaveResult" method="post" class="card rd-card p-3 mb-3">
+                <input type="hidden" name="EventID" value="@Model.SelectedEvent.EventID" />
+                <input type="hidden" name="EnrollID" value="@row.Enrollment.EnrollID" />
+                <input type="hidden" name="ResultsID" value="@(r != null ? r.ResultsID : 0)" />
+
+                <div class="row g-2 align-items-end">
+                    <div class="col-md-3">
+                        <div class="fw-bold">@row.Enrollment.ParticipantName</div>
+                        <div class="small text-muted">@row.Enrollment.CategoryName</div>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small mb-1">Outcome</label>
+                        <select name="ResultsStatus" class="form-select">
+                            <option value="Finished" selected="@(status == "Finished")">Finished</option>
+                            <option value="DNF" selected="@(status == "DNF")">Did not finish</option>
+                            <option value="DNS" selected="@(status == "DNS")">Did not start</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small mb-1">Finish time (hh:mm:ss)</label>
+                        <input type="time" step="1" name="FinishTime" value="@time" class="form-control" />
+                    </div>
+                    <div class="col-md-1">
+                        <label class="form-label small mb-1">Position</label>
+                        <input type="number" min="0" name="Position" value="@(r != null ? r.Position : 0)" class="form-control" />
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-rd w-100">@(r == null ? "Save" : "Update")</button>
+                    </div>
+                </div>
+            </form>
+        }
+    }
+}

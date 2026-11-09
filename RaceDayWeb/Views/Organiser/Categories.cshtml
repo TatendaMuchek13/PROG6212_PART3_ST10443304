@@ -1,0 +1,49 @@
+﻿@model CategoriesViewModel
+@{
+    ViewData["Title"] = "Categories";
+}
+
+<h1 class="rd-title mb-3">Categories</h1>
+
+<partial name="_EventPicker" model="Model" />
+
+@if (Model.SelectedEvent != null)
+{
+    <div class="card rd-card p-4 mb-4">
+        <h3 class="mb-3">Add a category to @Model.SelectedEvent.EventName</h3>
+        <form asp-action="AddCategory" method="post" class="row g-2">
+            <input type="hidden" name="eventId" value="@Model.SelectedEvent.EventID" />
+            <div class="col-md-8">
+                <input name="categoryName" class="form-control" maxlength="100" required
+                       placeholder="For example: Under 20, Senior, 10km, 21km" />
+            </div>
+            <div class="col-md-4">
+                <button type="submit" class="btn btn-rd w-100">Add category</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="card rd-card p-4">
+        <h3 class="mb-3">Categories for this event</h3>
+        @if (Model.Categories.Count == 0)
+        {
+            <p class="text-muted mb-0">No categories yet. Add one above so participants can enter this event.</p>
+        }
+        else
+        {
+            <ul class="list-group list-group-flush">
+                @foreach (var c in Model.Categories)
+                {
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span class="fw-semibold">@c.CategoryName</span>
+                        <form asp-action="DeleteCategory" asp-route-id="@c.CateID" method="post"
+                              onsubmit="return confirm('Delete this category?');">
+                            <input type="hidden" name="eventId" value="@Model.SelectedEvent.EventID" />
+                            <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                        </form>
+                    </li>
+                }
+            </ul>
+        }
+    </div>
+}
