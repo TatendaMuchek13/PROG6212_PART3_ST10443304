@@ -170,7 +170,8 @@ namespace RaceDayApi.Controllers
                 Name = participant.Name,
                 Surname = participant.Surname,
                 Cell = participant.Cell,
-                Email = participant.Email
+                Email = participant.Email,
+                ProfilePictureUrl = participant.ProfilePictureUrl
             };
         }
     }

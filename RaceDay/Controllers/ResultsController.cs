@@ -25,7 +25,7 @@ namespace RaceDayApi.Controllers
             return int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
         }
 
-        private static IQueryable<ResultDto> ToDto(IQueryable<Result> query)
+        private IQueryable<ResultDto> ToDto(IQueryable<Result> query)
         {
             return query.Select(r => new ResultDto
             {
@@ -33,13 +33,18 @@ namespace RaceDayApi.Controllers
                 EnrollID = r.EnrollID,
                 EventID = r.Enrollment.EventID,
                 EventName = r.Enrollment.Event.EventName,
+                DateOfEvent = r.Enrollment.Event.DateOfEvent,
                 CateID = r.CateID,
                 CategoryName = r.Category.CategoryName,
                 PNumber = r.Enrollment.PNumber,
                 ParticipantName = r.Enrollment.Participant.Name + " " + r.Enrollment.Participant.Surname,
                 ResultsStatus = r.ResultsStatus,
                 FinishTime = r.FinishTime,
-                Position = r.Position
+                Position = r.Position,
+                TotalFinishers = _context.Results.Count(x =>
+                    x.Enrollment.EventID == r.Enrollment.EventID &&
+                    x.CateID == r.CateID &&
+                    x.ResultsStatus == "Finished")
             });
         }
 

@@ -21,18 +21,99 @@ namespace RaceDayApi.Controllers
         }
 
         /// <summary>
-        /// Gets all events.
+        /// Gets events, with optional filters.
         /// </summary>
-        /// <remarks>Available to any logged-in user. Expects no request body.</remarks>
-        /// <response code="200">Returns the list of events.</response>
+        /// <remarks>
+        /// Available to any logged-in user. Expects no request body. All filters are optional
+        /// and can be combined: upcomingOnly (true returns only events that have not started),
+        /// eventType (Run, Walk or Cycle), fromDate and toDate (inclusive, for example 2026-12-01),
+        /// and search (matches part of the event name or the location). Results are sorted by date.
+        /// </remarks>
+        /// <param name="upcomingOnly">True to return only events that have not started yet.</param>
+        /// <param name="eventType">Run, Walk or Cycle.</param>
+        /// <param name="fromDate">Only events on or after this date.</param>
+        /// <param name="toDate">Only events on or before this date.</param>
+        /// <param name="search">Text to look for in the event name or location.</param>
+        /// <response code="200">Returns the matching events. The list is empty if none match.</response>
         /// <response code="401">The user is not logged in.</response>
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<Event>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public async Task<ActionResult<IEnumerable<Event>>> GetEvents()
+        public async Task<ActionResult<IEnumerable<Event>>> GetEvents(
+            bool upcomingOnly = false,
+            string? eventType = null,
+            DateTime? fromDate = null,
+            DateTime? toDate = null,
+            string? search = null)
         {
-            return await _context.Events.ToListAsync();
+            IQueryable<Event> query = _context.Events;
+
+            if (upcomingOnly)
+            {
+                query = query.Where(e => e.DateOfEvent >= DateTime.Now);
+            }
+
+            if (!string.IsNullOrWhiteSpace(eventType))
+            {
+                query = query.Where(e => e.EventType == eventType);
+            }
+
+            if (fromDate != null)
+            {
+                query = query.Where(e => e.DateOfEvent >= fromDate.Value.Date);
+            }
+
+            if (toDate != null)
+            {
+                query = query.Where(e => e.DateOfEvent < toDate.Value.Date.AddDays(1));
+            }
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                query = query.Where(e => e.EventName.Contains(search) || e.RouteInfo.Contains(search));
+            }
+
+            return await query.OrderBy(e => e.DateOfEvent).ToListAsync();
         }
+
+        /// <summary>
+        /// Gets the events owned by the logged-in Organiser, with enrolment totals.
+        /// </summary>
+        /// <remarks>
+        /// Organiser only. Expects no request body. Used for the dashboard: each event shows how
+        /// many enrolments it has (cancelled ones are not counted) and how many are still pending.
+        /// Events are sorted by date.
+        /// </remarks>
+        /// <response code="200">Returns the Organiser's events. The list is empty if there are none.</response>
+        /// <response code="401">The user is not logged in.</response>
+        /// <response code="403">The user is not an Organiser.</response>
+        [Authorize(Roles = "Organiser")]
+        [HttpGet("my")]
+        [ProducesResponseType(typeof(IEnumerable<OrganiserEventSummaryDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public async Task<ActionResult<IEnumerable<OrganiserEventSummaryDto>>> GetMyEvents()
+        {
+            int organiserCode = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+            return await _context.Events
+                .Where(e => e.OrganiserCode == organiserCode)
+                .OrderBy(e => e.DateOfEvent)
+                .Select(e => new OrganiserEventSummaryDto
+                {
+                    EventID = e.EventID,
+                    EventName = e.EventName,
+                    DateOfEvent = e.DateOfEvent,
+                    EventType = e.EventType,
+                    RouteInfo = e.RouteInfo,
+                    Distance = e.Distance,
+                    BannerUrl = e.BannerUrl,
+                    TotalEnrolments = _context.Enrollments.Count(en => en.EventID == e.EventID && en.Status != "Cancelled"),
+                    PendingEnrolments = _context.Enrollments.Count(en => en.EventID == e.EventID && en.Status == "Pending")
+                })
+                .ToListAsync();
+        }
+       
 
         /// <summary>
         /// Gets a single event by its id.

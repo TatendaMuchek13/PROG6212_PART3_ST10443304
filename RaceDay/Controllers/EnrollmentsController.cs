@@ -37,7 +37,9 @@ namespace RaceDayApi.Controllers
                 CategoryName = e.Category.CategoryName,
                 PNumber = e.PNumber,
                 ParticipantName = e.Participant.Name + " " + e.Participant.Surname,
-                DateOfEnroll = e.DateOfEnroll
+                DateOfEnroll = e.DateOfEnroll,
+                Status = e.Status
+
             });
         }
 
@@ -88,7 +90,7 @@ namespace RaceDayApi.Controllers
             }
 
             bool alreadyEnrolled = await _context.Enrollments
-                .AnyAsync(e => e.PNumber == pNumber && e.EventID == dto.EventID);
+    .AnyAsync(e => e.PNumber == pNumber && e.EventID == dto.EventID && e.Status != "Cancelled");
 
             if (alreadyEnrolled)
             {
@@ -221,5 +223,76 @@ namespace RaceDayApi.Controllers
 
             return await ToDto(_context.Enrollments.Where(e => e.EnrollID == id)).FirstAsync();
         }
+
+        /// <summary>
+        /// Changes the status of an enrolment.
+        /// </summary>
+        /// <remarks>
+        /// An Organiser can confirm or cancel enrolments for their own events. A Participant can only
+        /// cancel their own enrolment. Expects a JSON body with the new status (Confirmed or
+        /// Cancelled). A cancelled enrolment cannot be changed again, and neither can one that
+        /// already has a result.
+        /// </remarks>
+        /// <param name="id">The id of the enrolment.</param>
+        /// <param name="dto">The new status.</param>
+        /// <response code="200">The status was changed. Returns the updated enrolment.</response>
+        /// <response code="400">The status is not Confirmed or Cancelled.</response>
+        /// <response code="401">The user is not logged in.</response>
+        /// <response code="403">The enrolment belongs to someone else, or a Participant tried to set anything other than Cancelled.</response>
+        /// <response code="404">No enrolment has that id.</response>
+        /// <response code="409">The enrolment is already cancelled or already has a result.</response>
+        [HttpPut("{id}/status")]
+        [ProducesResponseType(typeof(EnrollmentDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status409Conflict)]
+        public async Task<ActionResult<EnrollmentDto>> UpdateStatus(int id, UpdateEnrollmentStatusDto dto)
+        {
+            Enrollment enrollment = await _context.Enrollments.FindAsync(id);
+
+            if (enrollment == null)
+            {
+                return NotFound();
+            }
+
+            Event parentEvent = await _context.Events.FindAsync(enrollment.EventID);
+            int userId = GetUserId();
+
+            if (User.IsInRole("Organiser"))
+            {
+                if (parentEvent.OrganiserCode != userId)
+                {
+                    return Forbid();
+                }
+            }
+            else
+            {
+                if (enrollment.PNumber != userId || dto.Status != "Cancelled")
+                {
+                    return Forbid();
+                }
+            }
+
+            if (enrollment.Status == "Cancelled")
+            {
+                return Conflict("This enrolment has already been cancelled.");
+            }
+
+            bool hasResult = await _context.Results.AnyAsync(r => r.EnrollID == id);
+
+            if (hasResult)
+            {
+                return Conflict("This enrolment already has a result and cannot be changed.");
+            }
+
+            enrollment.Status = dto.Status;
+            await _context.SaveChangesAsync();
+
+            return await ToDto(_context.Enrollments.Where(e => e.EnrollID == id)).FirstAsync();
+        }
+
+
     }
 }
