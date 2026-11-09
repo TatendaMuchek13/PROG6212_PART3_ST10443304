@@ -1,6 +1,7 @@
 using RaceDayWeb.Services;
 
-
+System.Globalization.CultureInfo.DefaultThreadCurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
+System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = System.Globalization.CultureInfo.InvariantCulture;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.

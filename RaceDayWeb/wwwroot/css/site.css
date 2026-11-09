@@ -205,3 +205,45 @@ h1, h2, h3, h4, .rd-title {
     color: #6B7686;
     font-size: .85rem;
 }
+/* Organiser pages */
+.rd-thumb {
+    width: 88px;
+    height: 56px;
+    object-fit: cover;
+    border-radius: 8px;
+    background: #DDE3EC;
+}
+
+.rd-thumb-lg {
+    width: 100%;
+    max-height: 220px;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+.rd-stat-number {
+    font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+    font-weight: 800;
+    font-size: 2.6rem;
+    line-height: 1;
+    color: var(--rd-navy);
+}
+
+.rd-stat-text {
+    font-weight: 700;
+    font-size: 1.15rem;
+    line-height: 1.2;
+    color: var(--rd-navy);
+}
+
+.rd-stat-label {
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    font-size: .75rem;
+    font-weight: 600;
+    color: #6B7686;
+}
+
+.rd-stat-warn .rd-stat-number {
+    color: var(--rd-amber);
+}

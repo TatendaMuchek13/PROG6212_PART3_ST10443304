@@ -1,0 +1,22 @@
+﻿@model EventPickerViewModel
+@{
+    string currentAction = ViewContext.RouteData.Values["action"]?.ToString() ?? "Dashboard";
+}
+
+<form method="get" asp-controller="Organiser" asp-action="@currentAction" class="card rd-card p-3 mb-4">
+    <label class="form-label fw-bold" for="eventId">Choose an event</label>
+    <div class="d-flex gap-2">
+        <select id="eventId" name="eventId" class="form-select" onchange="this.form.submit()">
+            <option value="">Select an event</option>
+            @foreach (var e in Model.Events)
+            {
+                <option value="@e.EventID" selected="@(Model.SelectedEvent != null && Model.SelectedEvent.EventID == e.EventID)">@(e.EventName + " (" + e.DateOfEvent.ToString("dd MMM yyyy") + ")")</option>
+            }
+        </select>
+        <noscript><button type="submit" class="btn btn-rd">Show</button></noscript>
+    </div>
+    @if (Model.Events.Count == 0)
+    {
+        <div class="form-text">You haven't created any events yet. <a asp-action="CreateEvent">Create one</a> first.</div>
+    }
+</form>
