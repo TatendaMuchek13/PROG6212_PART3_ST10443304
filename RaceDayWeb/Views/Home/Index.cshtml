@@ -1,8 +1,32 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Welcome";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<section class="rd-hero mb-5">
+    <p class="rd-kicker">Runs &middot; Walks &middot; Rides</p>
+    <h1 class="display-3">Find your next start line</h1>
+    <p class="lead col-lg-6">RaceDay brings organisers and participants together. Browse upcoming events, enter in seconds and follow your results.</p>
+    <a class="btn btn-rd btn-lg me-2" asp-controller="Account" asp-action="Register">Join RaceDay</a>
+    <a class="btn btn-outline-light btn-lg" asp-controller="Account" asp-action="Login">Log in</a>
+</section>
+
+<div class="row g-4">
+    <div class="col-md-4">
+        <div class="card rd-card h-100 p-4">
+            <h3>For participants</h3>
+            <p>Filter upcoming events, pick your category and enter in a couple of clicks.</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card rd-card h-100 p-4">
+            <h3>For organisers</h3>
+            <p>Create events, manage categories, confirm entries and capture results.</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card rd-card h-100 p-4">
+            <h3>Every result in one place</h3>
+            <p>Your race history, finish times and positions, kept for you.</p>
+        </div>
+    </div>
 </div>
