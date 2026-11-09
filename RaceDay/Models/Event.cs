@@ -34,5 +34,9 @@ namespace RaceDayApi.Models
 
         /// <summary>The type of event: Run, Walk or Cycle.</summary>
         public string EventType { get; set; }
+       
+
+
+        public string? BannerUrl { get; set; }
     }
 }

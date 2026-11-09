@@ -20,5 +20,7 @@ namespace RaceDayApi.Models
         public Category? Category { get; set; }
 
         public DateTime DateOfEnroll { get; set; }
+
+        public string Status { get; set; } = "Pending";     // Pending, Confirmed or Cancelled
     }
 }

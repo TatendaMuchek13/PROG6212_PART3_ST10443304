@@ -64,6 +64,10 @@ namespace RaceDayApi.Migrations
                     b.Property<int>("PNumber")
                         .HasColumnType("int");
 
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("EnrollID");
 
                     b.HasIndex("CateID");
@@ -82,6 +86,9 @@ namespace RaceDayApi.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EventID"));
+
+                    b.Property<string>("BannerUrl")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("DateOfEvent")
                         .HasColumnType("datetime2");

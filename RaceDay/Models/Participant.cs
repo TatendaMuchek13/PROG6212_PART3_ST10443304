@@ -12,6 +12,6 @@ namespace RaceDayApi.Models
         public string Cell { get; set; }
         public string Email { get; set; }
         public string Password { get; set; } //This field is added for the authentication and User-based roles
-
+        public string? ProfilePictureUrl { get; set; }
     }
 }
