@@ -1,6 +1,118 @@
-﻿@{
-    ViewData["Title"] = "Upcoming events";
+﻿@model List<EventModel>
+
+@{
+    ViewData["Title"] = "Upcoming Events";
 }
 
-<h1 class="rd-title">Upcoming events</h1>
-<p class="lead">Welcome, @Context.Session.GetString("UserName"). The event list and filters will appear here in the next batch.</p>
+<h1 class="rd-title">Upcoming Events</h1>
+
+<p class="lead">
+    Discover your next race and challenge yourself!
+</p>
+
+<!-- Search and filtering -->
+<form method="get"
+      asp-controller="Events"
+      asp-action="Index"
+      class="row g-3 mb-4">
+
+    <div class="col-md-6">
+        <label class="form-label">Search Events</label>
+
+        <input type="text"
+               name="search"
+               value="@ViewBag.Search"
+               class="form-control"
+               placeholder="Event name or location" />
+    </div>
+
+    <div class="col-md-4">
+        <label class="form-label">Event Type</label>
+
+        <select name="eventType" class="form-select">
+            <option value="">All Events</option>
+
+            @foreach (var type in new[] {
+                        "Run", "Walk", "Cycle"
+                        })
+            {
+                <option value="@type"
+                        selected="@(ViewBag.EventType == type)">
+                    @type
+                </option>
+            }
+        </select>
+    </div>
+
+    <div class="col-md-2 d-flex align-items-end">
+        <button type="submit"
+                class="btn btn-rd w-100">
+            Search
+        </button>
+    </div>
+</form>
+
+<!-- Event cards -->
+@if (!Model.Any())
+{
+    <div class="alert alert-info">
+        No upcoming events were found.
+    </div>
+}
+else
+{
+    <div class="row g-4">
+
+        @foreach (var ev in Model)
+        {
+            <div class="col-md-6 col-lg-4">
+
+                <div class="card rd-card h-100">
+
+                    @if (!string.IsNullOrEmpty(ev.BannerUrl))
+                    {
+                        <img src="@ev.BannerUrl"
+                             class="card-img-top"
+                             alt="@ev.EventName"
+                             style="height:190px;
+                                                object-fit:cover;" />
+                    }
+
+                    <div class="card-body">
+
+                        <span class="badge bg-primary mb-2">
+                            @ev.EventType
+                        </span>
+
+                        <h3 class="h5">
+                            @ev.EventName
+                        </h3>
+
+                        <p>
+                            <strong>Date:</strong>
+                            @ev.DateOfEvent.ToString("dd MMM yyyy")
+                        </p>
+
+                        <p>
+                            <strong>Location:</strong>
+                            @ev.RouteInfo
+                        </p>
+
+                        <p>
+                            <strong>Distance:</strong>
+                            @ev.Distance km
+                        </p>
+
+                        <a asp-controller="Events"
+                           asp-action="Details"
+                           asp-route-id="@ev.EventID"
+                           class="btn btn-rd">
+                            View Details
+                        </a>
+
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

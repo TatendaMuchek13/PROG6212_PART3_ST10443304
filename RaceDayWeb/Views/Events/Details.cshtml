@@ -1,0 +1,105 @@
+﻿@model EventDetailsViewModel
+
+@{
+    ViewData["Title"] = Model.Event.EventName;
+}
+
+<a asp-action="Index" class="btn btn-link mb-3">
+    Back to Events
+</a>
+
+@if (!string.IsNullOrEmpty(Model.Event.BannerUrl))
+{
+    <img src="@Model.Event.BannerUrl"
+         class="img-fluid rounded mb-4 w-100"
+         alt="Event Banner"
+         style="max-height:350px;object-fit:cover;" />
+}
+
+<h1 class="rd-title">@Model.Event.EventName</h1>
+
+<p class="lead">@Model.Event.Description</p>
+
+<div class="card rd-card mb-4">
+    <div class="card-body">
+
+        <h3>Event Information</h3>
+
+        <p>
+            <strong>Date:</strong>
+            @Model.Event.DateOfEvent.ToString("dd MMM yyyy HH:mm")
+        </p>
+
+        <p>
+            <strong>Location:</strong>
+            @Model.Event.RouteInfo
+        </p>
+
+        <p>
+            <strong>Distance:</strong>
+            @Model.Event.Distance km
+        </p>
+
+        <p>
+            <strong>Event Type:</strong>
+            @Model.Event.EventType
+        </p>
+
+    </div>
+</div>
+
+<h3>Register for this Event</h3>
+
+@if (Model.Event.DateOfEvent <= DateTime.Now)
+{
+    <div class="alert alert-warning">
+        Registration is unavailable because this
+        event has already started or finished.
+    </div>
+}
+else if (!Model.Categories.Any())
+{
+    <div class="alert alert-warning">
+        No categories are available for this event yet.
+    </div>
+}
+else
+{
+    <form asp-controller="Events"
+          asp-action="Enrol"
+          method="post">
+
+        @Html.AntiForgeryToken()
+
+        <input type="hidden"
+               name="eventId"
+               value="@Model.Event.EventID" />
+
+        <div class="mb-3">
+            <label class="form-label">
+                Select Category
+            </label>
+
+            <select name="cateId"
+                    class="form-select"
+                    required>
+
+                <option value="">
+                    Choose your category
+                </option>
+
+                @foreach (var category in Model.Categories)
+                {
+                    <option value="@category.CateID">
+                        @category.CategoryName
+                    </option>
+                }
+
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-rd">
+            Enrol Now
+        </button>
+    </form>
+}
