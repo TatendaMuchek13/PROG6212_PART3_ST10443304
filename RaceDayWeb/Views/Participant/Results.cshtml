@@ -1,0 +1,85 @@
+﻿@model List<ResultModel>
+
+@{
+    ViewData["Title"] = "My Results";
+}
+
+<h1 class="rd-title">My Results</h1>
+
+<p class="lead">
+    View your race history and finishing times.
+</p>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">
+        No race results have been published for you yet.
+    </div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-striped align-middle">
+
+            <thead>
+                <tr>
+                    <th>Event</th>
+                    <th>Date</th>
+                    <th>Category</th>
+                    <th>Status</th>
+                    <th>Finish Time</th>
+                    <th>Position</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @foreach (var result in
+                            Model.OrderByDescending(
+                            r => r.DateOfEvent))
+                {
+                    <tr>
+                        <td>@result.EventName</td>
+
+                        <td>
+                            @result.DateOfEvent
+                            .ToString("dd MMM yyyy")
+                        </td>
+
+                        <td>@result.CategoryName</td>
+
+                        <td>
+                            @result.ResultsStatus
+                        </td>
+
+                        <td>
+                            @if (result.ResultsStatus == "Finished")
+                            {
+                                @result.FinishTime.ToString(
+                                @"hh\:mm\:ss")
+                                        }
+                            else
+                            {
+                                <span>—</span>
+                            }
+                        </td>
+
+                        <td>
+                            @if (result.Position > 0)
+                            {
+                                <span>
+                                    @result.Position
+                                    of
+                                    @result.TotalFinishers
+                                </span>
+                            }
+                            else
+                            {
+                                <span>—</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

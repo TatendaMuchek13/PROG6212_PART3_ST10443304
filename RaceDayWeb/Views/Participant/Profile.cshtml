@@ -1,0 +1,121 @@
+﻿@model ProfileEditViewModel
+
+@{
+    ViewData["Title"] = "My Profile";
+}
+
+<h1 class="rd-title">My Profile</h1>
+
+<p class="lead">
+    Manage your personal information and profile picture.
+</p>
+
+<div class="row">
+    <div class="col-lg-7">
+
+        <div class="card rd-card">
+            <div class="card-body">
+
+                <h3 class="mb-4">Personal Information</h3>
+
+                @if (!string.IsNullOrEmpty(
+                                Model.ProfilePictureUrl))
+                {
+                    <div class="text-center mb-4">
+                        <img src="@Model.ProfilePictureUrl"
+                             alt="Profile Picture"
+                             class="rounded-circle"
+                             style="width:140px;
+                                        height:140px;
+                                        object-fit:cover;" />
+                    </div>
+                }
+
+                <form asp-controller="Participant"
+                      asp-action="Profile"
+                      method="post"
+                      enctype="multipart/form-data">
+
+                    @Html.AntiForgeryToken()
+
+                    <div asp-validation-summary="ModelOnly"
+                         class="text-danger mb-3">
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Name"
+                               class="form-label"></label>
+
+                        <input asp-for="Name"
+                               class="form-control" />
+
+                        <span asp-validation-for="Name"
+                              class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Surname"
+                               class="form-label"></label>
+
+                        <input asp-for="Surname"
+                               class="form-control" />
+
+                        <span asp-validation-for="Surname"
+                              class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Cell"
+                               class="form-label"></label>
+
+                        <input asp-for="Cell"
+                               class="form-control" />
+
+                        <span asp-validation-for="Cell"
+                              class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Email"
+                               class="form-label"></label>
+
+                        <input asp-for="Email"
+                               class="form-control" />
+
+                        <span asp-validation-for="Email"
+                              class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Picture"
+                               class="form-label">
+                            Profile Picture
+                        </label>
+
+                        <input asp-for="Picture"
+                               type="file"
+                               accept=".jpg,.jpeg,.png,.webp"
+                               class="form-control" />
+
+                        <span asp-validation-for="Picture"
+                              class="text-danger"></span>
+
+                        <small class="text-muted">
+                            JPEG, PNG or WebP. Maximum 5 MB.
+                        </small>
+                    </div>
+
+                    <button type="submit"
+                            class="btn btn-rd">
+                        Save Changes
+                    </button>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

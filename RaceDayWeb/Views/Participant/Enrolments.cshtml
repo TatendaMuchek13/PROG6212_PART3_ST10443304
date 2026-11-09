@@ -1,0 +1,80 @@
+﻿@model List<EnrollmentModel>
+
+@{
+    ViewData["Title"] = "My Enrolments";
+}
+
+<h1 class="rd-title">My Enrolments</h1>
+
+<p class="lead">
+    Track your race registrations and enrolment status.
+</p>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">
+        You haven't enrolled in any events yet.
+
+        <a asp-controller="Events"
+           asp-action="Index">
+            Browse upcoming events
+        </a>
+    </div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-striped align-middle">
+
+            <thead>
+                <tr>
+                    <th>Event</th>
+                    <th>Category</th>
+                    <th>Enrolment Date</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @foreach (var enrolment in
+                            Model.OrderByDescending(
+                            e => e.DateOfEnroll))
+                {
+                    string statusClass =
+                    enrolment.Status == "Confirmed"
+                    ? "bg-success"
+                    : enrolment.Status == "Pending"
+                    ? "bg-warning text-dark"
+                    : enrolment.Status == "Cancelled"
+                    ? "bg-danger"
+                    : "bg-secondary";
+
+                    <tr>
+                        <td>
+                            <a asp-controller="Events"
+                               asp-action="Details"
+                               asp-route-id="@enrolment.EventID">
+                                @enrolment.EventName
+                            </a>
+                        </td>
+
+                        <td>
+                            @enrolment.CategoryName
+                        </td>
+
+                        <td>
+                            @enrolment.DateOfEnroll
+                            .ToString("dd MMM yyyy")
+                        </td>
+
+                        <td>
+                            <span class="badge @statusClass">
+                                @enrolment.Status
+                            </span>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
