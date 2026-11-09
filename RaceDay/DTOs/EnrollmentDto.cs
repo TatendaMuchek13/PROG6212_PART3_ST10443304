@@ -26,5 +26,8 @@
 
         /// <summary>The date and time the participant enrolled (UTC).</summary>
         public DateTime DateOfEnroll { get; set; }
+
+        /// <summary>The status of the enrolment: Pending, Confirmed or Cancelled.</summary>
+        public string Status { get; set; }
     }
 }

@@ -15,6 +15,9 @@
         /// <summary>The name of the event.</summary>
         public string EventName { get; set; }
 
+        /// <summary>The date and time the event took place.</summary>
+        public DateTime DateOfEvent { get; set; }
+
         /// <summary>The id of the category the participant entered.</summary>
         public int CateID { get; set; }
 
@@ -35,5 +38,8 @@
 
         /// <summary>The finishing position. 0 means the participant did not finish or start.</summary>
         public int Position { get; set; }
+
+        /// <summary>How many participants finished in the same event and category, for example the 312 in "47th of 312".</summary>
+        public int TotalFinishers { get; set; }
     }
 }

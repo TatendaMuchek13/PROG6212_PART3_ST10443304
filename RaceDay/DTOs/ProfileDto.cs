@@ -17,8 +17,11 @@
 
         /// <summary>Cell number.</summary>
         public string Cell { get; set; }
-        ///
+
         /// <summary>Email address.</summary>
         public string Email { get; set; }
+
+        /// <summary>The address of the profile picture, or null if none was uploaded. Participants only.</summary>
+        public string? ProfilePictureUrl { get; set; }
     }
 }
